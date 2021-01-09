@@ -4,10 +4,13 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.job.builder.FlowBuilder;
+import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 @Configuration
 @EnableBatchProcessing
@@ -25,9 +28,20 @@ public class DataMigrationJobConfig {
 			@Qualifier(value = "migrationBankDataStep") Step migrateBankDataStep) {
 		return jobBuilderFactory
 				.get("dataMigrationJob")
-				.start(migratePersonStep)
-				.next(migrateBankDataStep)
+				.start(paralelSteps(migratePersonStep, migrateBankDataStep))
+				.end()
 				.incrementer(new RunIdIncrementer())
+				.build();
+	}
+
+	private Flow paralelSteps(Step migratePersonStep, Step migrateBankDataStep) {
+		Flow migrateBankDataFlow = new FlowBuilder<Flow>("migrateBankDataStep")
+				.start(migrateBankDataStep)
+				.build();
+		return new FlowBuilder<Flow>("paralelSteps")
+				.start(migratePersonStep)
+				.split(new SimpleAsyncTaskExecutor())
+				.add(migrateBankDataFlow)
 				.build();
 	}
 	
