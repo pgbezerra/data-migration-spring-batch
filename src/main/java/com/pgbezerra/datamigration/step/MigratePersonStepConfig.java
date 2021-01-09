@@ -28,7 +28,7 @@ public class MigratePersonStepConfig {
 				.get("migrationpersonStep")
 				.<Person, Person>chunk(100)
 				.reader(personFileReader)
-				.writer(personDataWriter)
+				.writer(persons -> persons.forEach(System.out::println))
 				.build();
 	}
 

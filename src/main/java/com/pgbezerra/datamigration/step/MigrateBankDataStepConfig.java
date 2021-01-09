@@ -22,12 +22,12 @@ public class MigrateBankDataStepConfig {
 	@Bean(name = "migrationBankDataStep")
 	public Step migrationBankDataStep(
 			@Qualifier(value = "bankDataFileReader") ItemReader<BankData> bankDataFileReader,
-			@Qualifier(value = "bankDataDataWriter") ItemWriter<BankData> bankDataDataWriter) {
+			@Qualifier(value = "bankDataWriter") ItemWriter<BankData> bankDataWriter) {
 		return stepBuilderFactory
-				.get("migrationpersonStep")
+				.get("migrationBankDataStep")
 				.<BankData, BankData>chunk(100)
 				.reader(bankDataFileReader)
-				.writer(bankDataDataWriter)
+				.writer(banks -> banks.forEach(System.out::println))
 				.build();
 	}
 	
