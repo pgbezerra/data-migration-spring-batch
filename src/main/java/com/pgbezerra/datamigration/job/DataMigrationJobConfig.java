@@ -1,5 +1,7 @@
 package com.pgbezerra.datamigration.job;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -16,6 +18,8 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 @EnableBatchProcessing
 public class DataMigrationJobConfig {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(DataMigrationJobConfig.class);
+	
 	private JobBuilderFactory jobBuilderFactory;
 
 	public DataMigrationJobConfig(JobBuilderFactory jobBuilderFactory) {
@@ -26,6 +30,7 @@ public class DataMigrationJobConfig {
 	public Job dataMigrationJob(
 			@Qualifier(value = "migrationPersonStep") Step migratePersonStep,
 			@Qualifier(value = "migrationBankDataStep") Step migrateBankDataStep) {
+		LOG.info("Starting job config");
 		return jobBuilderFactory
 				.get("dataMigrationJob")
 				.start(paralelSteps(migratePersonStep, migrateBankDataStep))
@@ -35,6 +40,7 @@ public class DataMigrationJobConfig {
 	}
 
 	private Flow paralelSteps(Step migratePersonStep, Step migrateBankDataStep) {
+		LOG.info("Start paralel jobs");
 		Flow migrateBankDataFlow = new FlowBuilder<Flow>("migrateBankDataStep")
 				.start(migrateBankDataStep)
 				.build();

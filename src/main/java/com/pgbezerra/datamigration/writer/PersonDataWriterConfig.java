@@ -5,6 +5,8 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
@@ -17,6 +19,9 @@ import com.pgbezerra.datamigration.model.Person;
 @Component
 public class PersonDataWriterConfig {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(PersonClassifiedWriterConfig.class);
+
+	
 	@Bean(name = "personDataWriter")
 	public JdbcBatchItemWriter<Person> personDataWriter(@Qualifier(value = "appDataSource") DataSource dataSource){
 		StringBuilder sql = new StringBuilder();
@@ -24,6 +29,7 @@ public class PersonDataWriterConfig {
 		sql.append("   (person_id, name, email, birthdate) ");
 		sql.append(" VALUES ");
 		sql.append("   (?, ?, ?, ?)");
+		LOG.info("Building person jdbc person data writer");
 		return new JdbcBatchItemWriterBuilder<Person>()
 				.dataSource(dataSource)
 				.sql(sql.toString())

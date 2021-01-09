@@ -1,5 +1,7 @@
 package com.pgbezerra.datamigration.writer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -14,11 +16,15 @@ import com.pgbezerra.datamigration.model.BankData;
 
 @Configuration
 public class BankDataClassifiedWriterConfig {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(BankDataClassifiedWriterConfig.class);
+
 
 	@Bean(name = "classifierBankDataItemWriter")
 	public ClassifierCompositeItemWriter<BankData> classifierBankDataItemWriter(
 			@Qualifier(value = "bankDataWriter") JdbcBatchItemWriter<BankData> personDataWriter,
 			@Qualifier(value = "invalidBankDataWriter") FlatFileItemWriter<BankData> invalidPersonWriter) {
+		LOG.info("Build classified bank data item writer");
 		return new ClassifierCompositeItemWriterBuilder<BankData>()
 				.classifier(classifier(personDataWriter, invalidPersonWriter)).build();
 	}
@@ -31,8 +37,12 @@ public class BankDataClassifiedWriterConfig {
 
 			@Override
 			public ItemWriter<? super BankData> classify(BankData bankData) {
-				if (bankData.isValid())
+				LOG.info("Checking the writter");
+				if (bankData.isValid()) {
+					LOG.info("Person is valid, returning jdbc writer");
 					return personDataWriter;
+				}
+				LOG.warn("Person is invalid, returning invalid person writer");
 				return invalidPersonWriter;
 			}
 		};

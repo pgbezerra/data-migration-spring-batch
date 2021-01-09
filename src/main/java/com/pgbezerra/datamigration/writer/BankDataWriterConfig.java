@@ -5,6 +5,8 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
@@ -17,6 +19,9 @@ import com.pgbezerra.datamigration.model.BankData;
 @Component
 public class BankDataWriterConfig {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(BankDataWriterConfig.class);
+	
+	
 	@Bean(name = "bankDataWriter")
 	public JdbcBatchItemWriter<BankData> bankDataWriter(@Qualifier("appDataSource") DataSource dataSource){
 		StringBuilder sql = new StringBuilder();
@@ -24,6 +29,7 @@ public class BankDataWriterConfig {
 		sql.append("   (bank_data_id, person_id, branch, account, bank) ");
 		sql.append(" VALUES ");
 		sql.append("   (?, ?, ?, ?, ?)");
+		LOG.info("Building jdbc bank data writer");
 		return new JdbcBatchItemWriterBuilder<BankData>()
 				.dataSource(dataSource)
 				.sql(sql.toString())
