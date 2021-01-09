@@ -2,6 +2,9 @@ package com.pgbezerra.datamigration.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
+
+import org.apache.logging.log4j.util.Strings;
 
 import com.pgbezerra.datamigration.annotations.Header;
 
@@ -25,6 +28,11 @@ public class Person implements Serializable {
 	private LocalDate birthDate;
 	@Header
 	private Integer id;
+	
+	
+	public boolean isValid() {
+		return !Strings.isBlank(name) && !Strings.isBlank(email) && Objects.nonNull(birthDate);
+	}
 	
 	
 

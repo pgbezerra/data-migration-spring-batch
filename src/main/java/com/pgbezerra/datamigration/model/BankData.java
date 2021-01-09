@@ -1,6 +1,7 @@
 package com.pgbezerra.datamigration.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import com.pgbezerra.datamigration.annotations.Header;
 
@@ -25,5 +26,9 @@ public class BankData implements Serializable {
 	private Integer bank;
 	@Header
 	private Integer id;
+	
+	public boolean isValid() {
+		return Objects.nonNull(personId) && Objects.nonNull(branch) && Objects.nonNull(account) && Objects.nonNull(bank);
+	}
 	
 }

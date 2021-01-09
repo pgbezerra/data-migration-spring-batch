@@ -34,8 +34,13 @@ public class PersonFileReaderConfig {
 				Person bankData = new Person();
 				bankData.setName(fieldSet.readString("name"));
 				bankData.setEmail(fieldSet.readString("email"));
-				bankData.setBirthDate(
-						new java.sql.Date(fieldSet.readDate("birthDate", "yyyy-MM-dd hh:mm").getTime()).toLocalDate());
+				try {
+					bankData.setBirthDate(
+							new java.sql.Date(fieldSet.readDate("birthDate", "yyyy-MM-dd hh:mm").getTime())
+									.toLocalDate());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				bankData.setId(fieldSet.readInt("id"));
 				return bankData;
 			}

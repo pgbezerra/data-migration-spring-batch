@@ -27,7 +27,7 @@ public class MigrateBankDataStepConfig {
 				.get("migrationBankDataStep")
 				.<BankData, BankData>chunk(100)
 				.reader(bankDataFileReader)
-				.writer(banks -> banks.forEach(System.out::println))
+				.writer(bankDataWriter)
 				.build();
 	}
 	

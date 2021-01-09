@@ -4,7 +4,9 @@ package com.pgbezerra.datamigration.step;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.file.FlatFileItemWriter;
+import org.springframework.batch.item.support.ClassifierCompositeItemWriter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,12 +25,14 @@ public class MigratePersonStepConfig {
 	@Bean(name = "migrationPersonStep")
 	public Step migrationPersonStep(
 			@Qualifier(value = "personFileReader") ItemReader<Person> personFileReader,
-			@Qualifier(value = "personDataWriter") ItemWriter<Person> personDataWriter) {
+			@Qualifier(value = "classifierPersonItemWriter") ClassifierCompositeItemWriter<Person> classifierPersonItemWriter,
+			@Qualifier(value = "invalidPersonWriter") FlatFileItemWriter<Person> invalidPersonWriter) {
 		return stepBuilderFactory
 				.get("migrationpersonStep")
 				.<Person, Person>chunk(100)
 				.reader(personFileReader)
-				.writer(persons -> persons.forEach(System.out::println))
+				.writer(classifierPersonItemWriter)
+				.stream(invalidPersonWriter)
 				.build();
 	}
 
